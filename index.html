@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <div id="view">
+    <div v-bind:id="id">
+      {{message}}:{{name}}
+    </div>
+    <input type="text" v-model="name"/>
+    <button v-on:click="handleClick">获取输入值</button>
+  </div>
+</body>
+<script src="js/MVVM.js" type="text/javascript"></script>
+<script>
+  var vue = new MVVM({
+    el: "#view",
+    data: {
+      message: "欢迎光临",
+      name: "鸣人",
+      id: "id"
+    },
+    methods: {
+      handleClick: function() {
+        alert(this.message + ":" + this.name + ", 点击确定路飞会出来");
+        this.name = '路飞';
+      }
+    }
+  })
+
+  setTimeout(function() {
+    vue.$data.message = "你好";
+  }, 1000);
+</script>
+</html>
