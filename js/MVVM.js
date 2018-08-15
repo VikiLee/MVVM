@@ -100,6 +100,9 @@ MVVM.prototype._compile = function() {
   var children = dom.children;
   var self = this;
   var i = 0, j = 0;
+
+  // 更新函数，但observer中model的数据改变的时候，通过Watcher的update调用更新函数，从而更新dom
+  var updater = null;
   for(; i < children.length; i++) {
     var node = children[i];
     (function(node) {
@@ -116,7 +119,7 @@ MVVM.prototype._compile = function() {
           // 将和该node绑定的data属性保存起来
           node.bindingAttributes.push(attr);
           (function(attr) {
-            self._binding[attr]._texts.push(new Watcher(self, attr, function() {
+            updater = function() {
               // 改变的属性值对应的文本进行替换
               var innerText = text.replace(new RegExp("{{" + attr + "}}", "g"), self.$data[attr]);
               // 如果该node绑定多个属性 eg:<div>{{title}}{{description}}</div>
@@ -127,7 +130,8 @@ MVVM.prototype._compile = function() {
                 }
               }
               node.innerText = innerText;
-            }));
+            };
+            self._binding[attr]._texts.push(new Watcher(self, attr, updater));
           })(attr);
         }
       }
@@ -141,8 +145,6 @@ MVVM.prototype._compile = function() {
         var domAttr = null;
         // 绑定的data属性
         var vmDataAttr = node.getAttribute(attribute);
-        // 更新函数，但observer中model的数据改变的时候，通过Watcher的update调用更新函数，从而更新dom
-        var updater = null;
        
         if(/v-bind:([^=]+)/.test(attribute)) {
           // 解析v-bind
